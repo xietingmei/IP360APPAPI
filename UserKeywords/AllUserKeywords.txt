@@ -1,0 +1,4 @@
+*** Settings ***
+Variables         ../common_config.py
+Resource          01_AdminKeywords/AllAdminKeywords.txt
+

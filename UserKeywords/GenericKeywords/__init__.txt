@@ -1,0 +1,3 @@
+*** Settings ***
+Resource          ../../SystemKeywords/AllSystemKeywords.txt
+Variables         ../../pysical_devices.py

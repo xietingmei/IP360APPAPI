@@ -1,0 +1,32 @@
+*** Settings ***
+Variables         IP360_APP_xianchangzhengju_testdata.py
+Variables         IP360_account_testdata.py
+Resource          ../UserKeywords/AllUserKeywords.txt
+
+*** Test Cases ***
+01_IP360APPAPI_xianchangquzheng
+    log    步骤1：登录获取token
+    @{userinfo}    ip360appapi Login    &{testdata_001_ip360_account_001}
+    log    步骤2：APP现场取证保全
+    @{resourceid}    Ip360appapi Xianchangquzheng    @{userinfo}[0]    &{testdata_001_ip360_xianchangquzheng_001}
+    Run Keyword if    @{resourceid}[0]!=1    Fail
+    log     步骤3：支付
+    ${flag_ret}    Ip360appapi Payment    @{userinfo}[0]    @{resourceid}[1]    &{testdata_001_ip360_payment_001}
+    Run Keyword if    ${flag_ret}!=1    Fail
+    log     步骤4：上传文件到OSS
+    ${flag_ret}    Upload File Oss    test.png    @{resourceid}[2]
+    Run Keyword if    ${flag_ret}!=1    Fail
+    log    步骤5：上传文件回调
+    ${flag_ret}    Ip360appapi Uploadfilecallback    @{userinfo}[0]    @{resourceid}[1]
+    Run Keyword if    ${flag_ret}!=1    Fail
+    Comment    log    步骤6：检查data_right数据库temp4是否为2
+    Comment    sleep    30s
+    Comment    ${status}    Mysql Search Table    &{IP360_SERVER_DB}[DB_NAME]    select temp4 from data_right where user_id="988" and type='1' order by id desc limit 1;
+    Comment    Run Keyword if    ${status}!=2    Fail
+
+02_IP360APPAPI_GetEvidenceList
+    log    步骤1：登录获取token
+    @{userinfo}    ip360appapi Login    &{testdata_001_ip360_account_001}
+    log    步骤2：获取证据列表
+    ${flag_ret}    Ip360appapi Getevidencelist    @{userinfo}[0]    &{testdata_001_ip360_getevidencelist_001}
+    Run Keyword if    ${flag_ret}!=1    Fail
